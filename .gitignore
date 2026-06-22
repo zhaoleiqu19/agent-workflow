@@ -1,0 +1,5 @@
+# Local Claude Code settings (machine-specific)
+.claude/
+
+# Subagent-driven-development scratch (briefs, reports, ledger, diffs)
+.superpowers/

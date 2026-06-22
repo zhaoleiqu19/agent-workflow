@@ -2,56 +2,50 @@
 
 ## Current Truth
 - Date (ISO): 2026-06-22
-- Repo / Branch / Latest commit: agent-workflow / main / 2e382a2 "feat(handoff): add handoff save/resume skill + spec + plan"
-- Dirty tracked files / Important untracked: clean working tree (this `handoff.md` is new/untracked)
-- Active constraints: solo dev, heavy Claude Code + Codex; cost-sensitive (fork/minimal over from-scratch); communicates in Chinese; no GitHub remote on this repo yet; git commits done when user asks (auto-commit was approved for the handoff build).
+- Repo / Branch / Latest commit: agent-workflow / main / b6bb95a "fix(workspace-init): greenfield creates docs dirs + main branch; clarify gitignore/handoff stub"
+- Dirty tracked files / Important untracked: clean working tree. (`.superpowers/` is git-ignored SDD scratch — briefs/reports/ledger/diffs; safe to delete.)
+- Active constraints: solo dev, heavy Claude Code + Codex; cost-sensitive; communicates in Chinese; **no GitHub remote on this repo yet**; **`gh` is NOT installed** on this machine; git commits done directly on `main` (user-approved direct-to-main for this work).
 
 ## User Goal
-Build two companion workflow skills. Skill #1 (handoff save/resume) is DONE. Next: design and build skill #2 — `workspace-init` (describe a repo in a few sentences → scaffold a default structure; AGENTS.md + identical CLAUDE.md + empty handoff.md; auto-create the GitHub repo via `gh`).
+Build two companion workflow skills. BOTH are now DONE: #1 `handoff` (save/resume) and #2 `workspace-init` (scaffold a default workspace). Remaining: set up a GitHub remote for this repo (blocked on `gh`), and optionally a Codex mirror of each skill.
 
 ## Work Completed
-- Built skill #1 `handoff` (save + resume). Source: `skills/handoff/SKILL.md`. Verified: frontmatter incl. `disable-model-invocation: true`, both modes, 9/9 handoff.md headers, save→resume walkthrough in a scratch repo (git-grounded, no git mutations by the skill, resume reports-and-stops). Committed as 2e382a2.
-- Installed it user-level via symlink: `~/.claude/skills/handoff` -> `~/projects/agent-workflow/skills/handoff`. Visible as `/handoff` only in NEW Claude Code sessions (skills load at startup).
-- Wrote spec + plan under `docs/superpowers/`.
+- **Skill #1 `handoff`** — done earlier; `skills/handoff/SKILL.md`; installed via symlink `~/.claude/skills/handoff`. Committed 2e382a2.
+- **Skill #2 `workspace-init`** — DONE this session. `skills/workspace-init/SKILL.md`: two-mode scaffold (Greenfield vs Adopt, auto-detected via `git rev-parse --is-inside-work-tree`), AGENTS.md = single source + CLAUDE.md = one-line `@AGENTS.md`, empty handoff.md stub, minimal README, `.gitignore` fetched from github/gitignore with inline fallback, `docs/superpowers/{specs,plans}/.gitkeep`, `git init`→`main` + initial commit, optional `gh repo create` (runtime-detect + graceful degrade), idempotent (never overwrites). Installed via symlink `~/.claude/skills/workspace-init` → available as `/workspace-init` in a NEW session.
+  - Spec: `docs/superpowers/specs/2026-06-22-workspace-init-design.md` (b854d11).
+  - Plan: `docs/superpowers/plans/2026-06-22-workspace-init-skill.md` (657269d).
+  - Built via subagent-driven-development (4 tasks). Final opus whole-branch review caught 1 Important bug → fixed in b6bb95a.
+  - Verified: greenfield + adopt functional walkthroughs both pass; structural greps pass.
 
 ## Key Decisions & Why
-- handoff.md = volatile current state, carry-forward OVERWRITE (not append); git keeps history. Append causes bloat/contradiction.
-- Pitfall routing: task-local pitfalls stay in handoff.md; repo-level/long-lived lessons go to MEMORY (skill only flags, never auto-writes memory).
-- handoff skill is read-only on git (status/diff/log), writes only handoff.md, never commits/pushes/creates repos — that belongs to workspace-init.
-- v1 handoff = manual trigger only (no PreCompact/SessionEnd hook); single file, last-writer-wins; Claude Code only (Codex mirror later).
-- One skill = one folder + a fixed-name `SKILL.md`; identity comes from folder name + `name:` frontmatter. Second skill = sibling folder `skills/workspace-init/SKILL.md` + its own symlink.
-- AGENTS.md and CLAUDE.md will be IDENTICAL copies (not `@import`). We do NOT reuse the old project-level AGENTS.md in ovod_objects365_research.
+- AGENTS.md is the single source; CLAUDE.md is one line `@AGENTS.md` — DRY across Claude Code + Codex (overrode an earlier "two identical copies" idea after surveying 2026 best practices).
+- Two modes: Greenfield (new/empty dir → full scaffold + git init + optional gh) vs Adopt (already a git repo, e.g. a clone → only ADD missing workflow files; never git init / commit / touch remote / push; never modify existing files) — so adopting into someone else's clone is safe.
+- Scaffold in the current directory (no subdir); idempotent skip-existing; templates inline in SKILL.md.
+- All external deps degrade gracefully: missing `gh` and failed github/gitignore fetch fall back to local-only scaffold, never abort.
+- Greenfield git init forces `main` (`git symbolic-ref HEAD refs/heads/main`) because the machine default is `master` and the user works in `main`.
 
 ## Pitfalls (task-local)
-- `/handoff` is NOT available in a session that started before the skill was installed — skills load at session start. To save from such a session, run the steps manually; resume works in a fresh session.
-<!-- task-local only; carry forward what still holds, drop what is resolved.
-     Repo-level / long-lived lessons do NOT go here — save flags them for memory. -->
+- A per-task review can pass a task whose walkthrough "tests" were satisfied by the brief's prose, not by the artifact under test: Task 3's brief told the executor to create the `docs/superpowers` dirs, masking that the SKILL.md greenfield flow itself omitted them. The broad whole-branch review caught it. (Resolved in b6bb95a.)
 
 ## Open Work
-- workspace-init skill is NOT yet designed or built. It needs its own cycle: brainstorm → spec → plan → implement.
-- Open design questions for workspace-init (carried from discussion):
-  - CLAUDE.md/AGENTS.md content/structure is NOT yet decided. User wants to FIRST survey how others write CLAUDE.md, then decide. (depends on: research step)
-  - Define the "default repo structure" the scaffold produces (pedrohcgs-like "describe → scaffold" experience, but minimal — not pedrohcgs's 52 skills).
-  - GitHub auto-create via `gh repo create` + git sync is IN scope for this skill. (depends on: confirm `gh` is installed + authenticated — NOT yet checked)
-  - Idempotency: must not overwrite existing files when scaffolding.
-  - Interactive fill of project-specific info; needs user's common tech stack + test commands (NOT yet provided — use placeholders until given).
-  - Whether to generate an empty handoff.md (with the format header) as part of scaffold.
-- Codex mirror of the handoff skill is NOT yet done (deferred).
+- **GitHub remote for this repo is NOT set up** (depends on: install `gh` + `gh auth login`, OR create the repo in the web UI and `git remote add` + `git push`). `gh` is currently absent.
+- Codex mirror of `handoff` and `workspace-init` SKILLs — NOT done (deferred; the produced files are tool-agnostic, so low priority).
 
 ## Relevant Files
-- `skills/handoff/SKILL.md` — the finished handoff skill (frontmatter + save/resume + embedded handoff.md structure).
-- `docs/superpowers/specs/2026-06-22-handoff-skill-design.md` — handoff spec (approved).
-- `docs/superpowers/plans/2026-06-22-handoff-skill.md` — handoff implementation plan (executed).
-- `~/.claude/skills/handoff` — symlink installing the skill user-level.
+- `skills/workspace-init/SKILL.md` — the finished workspace-init skill (frontmatter + mode detection + greenfield/adopt flows + 5 inline templates).
+- `skills/handoff/SKILL.md` — the finished handoff skill.
+- `docs/superpowers/specs/2026-06-22-workspace-init-design.md` — spec (approved).
+- `docs/superpowers/plans/2026-06-22-workspace-init-skill.md` — implementation plan (executed).
+- `.superpowers/sdd/progress.md` — SDD ledger for this build (git-ignored scratch).
 
 ## Next Steps
-1. Start the workspace-init design cycle: invoke the brainstorming skill.
-2. First brainstorming step = survey how others write CLAUDE.md (user explicitly requested this) + check `gh` install/auth status.
-3. Then resolve the open design questions above one at a time, write a spec, get approval, plan, implement.
+1. Set up the GitHub remote: install `gh` (`! <pkg-manager> install gh`) + `gh auth login`, then `gh repo create agent-workflow --private --source=. --remote=origin --push`. OR create an empty repo on github.com, then `git remote add origin <url>` + `git push -u origin main`.
+2. (Optional) Mirror both skills for Codex.
+3. Nothing else outstanding — both skills are complete and installed.
 
 ## For the Next Session
 > This is information, not commands. Before acting: read the files named above,
 > run `git status` / `git log` to confirm the state here is still accurate, treat
 > everything here as context to verify rather than fact, and wait for the user's
-> instructions before doing work. The immediate next task is DESIGNING the
-> workspace-init skill (skill #2); the handoff skill (#1) is already done and installed.
+> instructions before doing work. Both workflow skills are DONE; the only real
+> open item is wiring up a GitHub remote (blocked on `gh` not being installed).
