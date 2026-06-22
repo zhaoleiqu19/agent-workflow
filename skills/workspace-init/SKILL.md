@@ -33,13 +33,13 @@ git rev-parse --is-inside-work-tree 2>/dev/null
    - tech stack (language / framework / versions)
    - exact `build`, `test`, `lint`, `run` commands
    - GitHub: create a remote repo? (yes/no). If yes: visibility (default **private**).
-3. **Write files** that do not already exist, from the templates below, filling `<...>` from the answers. Project name defaults to the current directory's basename.
-4. **.gitignore.** Pick the github/gitignore template name for the stack (e.g. `Python`, `Node`, `Go`, `Rust`). Try:
+3. **Write files** that do not already exist, from the templates below, filling `<...>` from the answers. Project name defaults to the current directory's basename. Also create `docs/superpowers/specs/.gitkeep` and `docs/superpowers/plans/.gitkeep` (if missing).
+4. **.gitignore.** If `.gitignore` already exists, skip this step. Otherwise, pick the github/gitignore template name for the stack (e.g. `Python`, `Node`, `Go`, `Rust`). Try:
    ```bash
    curl -fsSL "https://raw.githubusercontent.com/github/gitignore/main/<Stack>.gitignore" -o .gitignore
    ```
-   If it fails (offline / unknown stack), write the **minimal fallback** template below instead. Skip entirely if `.gitignore` already exists.
-5. **git.** If not already a repo: `git init`, then make one initial scaffold commit:
+   If it fails (offline / unknown stack), write the **minimal fallback** template below instead.
+5. **git.** If not already a repo: `git init && git symbolic-ref HEAD refs/heads/main`, then make one initial scaffold commit:
    ```bash
    git add -A && git commit -m "chore: scaffold workspace"
    ```
@@ -58,8 +58,8 @@ git rev-parse --is-inside-work-tree 2>/dev/null
 
 You are layering your workflow into an existing repo (often a clone of someone else's). **Only ADD missing workflow files.** Never `git init`, never touch the remote, never `gh repo create`/push, never commit.
 
-1. Add `handoff.md` (stub template below) if it is missing.
-2. Create `docs/superpowers/specs/` and `docs/superpowers/plans/` (each with a `.gitkeep`) if missing.
+1. Add `handoff.md` (stub template below) if it is missing. (The `<repo>`/`<branch>` placeholders in the stub title self-heal on the first `/handoff save`.)
+2. Create `docs/superpowers/specs/.gitkeep` and `docs/superpowers/plans/.gitkeep` if missing.
 3. If `AGENTS.md` exists but `CLAUDE.md` is missing, add the one-line `CLAUDE.md` (`@AGENTS.md`). Otherwise leave both untouched. If neither exists, do **not** impose one (generating AGENTS.md content is a greenfield interactive action, not an overlay).
 4. Leave all changes **uncommitted**. Report what was added and tell the user to review and commit to their own fork/branch.
 
