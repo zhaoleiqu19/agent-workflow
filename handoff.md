@@ -2,50 +2,48 @@
 
 ## Current Truth
 - Date (ISO): 2026-06-22
-- Repo / Branch / Latest commit: agent-workflow / main / b6bb95a "fix(workspace-init): greenfield creates docs dirs + main branch; clarify gitignore/handoff stub"
-- Dirty tracked files / Important untracked: clean working tree. (`.superpowers/` is git-ignored SDD scratch — briefs/reports/ledger/diffs; safe to delete.)
-- Active constraints: solo dev, heavy Claude Code + Codex; cost-sensitive; communicates in Chinese; **no GitHub remote on this repo yet**; **`gh` is NOT installed** on this machine; git commits done directly on `main` (user-approved direct-to-main for this work).
+- Repo / Branch / Latest commit: agent-workflow / main / dce7171 "chore: refresh handoff for completed workspace-init; add .gitignore" (this refresh will add the next commit)
+- Dirty tracked files / Important untracked: clean (only this handoff.md edit pending). `.claude/` and `.superpowers/` are git-ignored.
+- Active constraints: solo dev, heavy Claude Code + Codex; cost-sensitive; communicates in Chinese; commits go directly on `main` (user-approved). GitHub remote now configured; `gh` now installed.
 
 ## User Goal
-Build two companion workflow skills. BOTH are now DONE: #1 `handoff` (save/resume) and #2 `workspace-init` (scaffold a default workspace). Remaining: set up a GitHub remote for this repo (blocked on `gh`), and optionally a Codex mirror of each skill.
+Build two companion workflow skills (handoff, workspace-init) and make them usable from both Claude Code and Codex, in a repo backed by GitHub. ALL DONE — nothing substantive outstanding.
 
 ## Work Completed
-- **Skill #1 `handoff`** — done earlier; `skills/handoff/SKILL.md`; installed via symlink `~/.claude/skills/handoff`. Committed 2e382a2.
-- **Skill #2 `workspace-init`** — DONE this session. `skills/workspace-init/SKILL.md`: two-mode scaffold (Greenfield vs Adopt, auto-detected via `git rev-parse --is-inside-work-tree`), AGENTS.md = single source + CLAUDE.md = one-line `@AGENTS.md`, empty handoff.md stub, minimal README, `.gitignore` fetched from github/gitignore with inline fallback, `docs/superpowers/{specs,plans}/.gitkeep`, `git init`→`main` + initial commit, optional `gh repo create` (runtime-detect + graceful degrade), idempotent (never overwrites). Installed via symlink `~/.claude/skills/workspace-init` → available as `/workspace-init` in a NEW session.
-  - Spec: `docs/superpowers/specs/2026-06-22-workspace-init-design.md` (b854d11).
-  - Plan: `docs/superpowers/plans/2026-06-22-workspace-init-skill.md` (657269d).
-  - Built via subagent-driven-development (4 tasks). Final opus whole-branch review caught 1 Important bug → fixed in b6bb95a.
-  - Verified: greenfield + adopt functional walkthroughs both pass; structural greps pass.
+- **Skill #1 `handoff`** (save/resume): `skills/handoff/SKILL.md`. Committed 2e382a2.
+- **Skill #2 `workspace-init`** (two-mode scaffold: Greenfield vs Adopt; AGENTS.md source + CLAUDE.md `@AGENTS.md`; handoff stub; README; github/gitignore fetch+fallback; `git init`→`main`; optional `gh repo create` with graceful degrade; idempotent). Spec b854d11, skill+plan 657269d, final-review fix b6bb95a. Built via subagent-driven-development; opus whole-branch review caught + fixed a real bug (greenfield wasn't creating `docs/superpowers` dirs).
+- **Installed for BOTH tools via symlinks to the single repo source:**
+  - Claude Code: `~/.claude/skills/{handoff,workspace-init}` → repo.
+  - Codex: `~/.codex/skills/{handoff,workspace-init}` → repo. (codex-cli 0.139.0 uses the same `SKILL.md` format; user skills live in `$CODEX_HOME/skills/`.) Edit the repo once, both tools pick it up on next session start.
+- **GitHub remote**: `gh` 2.95.0 installed via conda; logged in as `zhaoleiqu19`; private repo https://github.com/zhaoleiqu19/agent-workflow created; `main` pushed and tracking `origin/main`. `gh auth setup-git` configured git's credential helper (plain `git push` works now).
+- `.gitignore` added (ignores `.claude/`, `.superpowers/`).
 
 ## Key Decisions & Why
-- AGENTS.md is the single source; CLAUDE.md is one line `@AGENTS.md` — DRY across Claude Code + Codex (overrode an earlier "two identical copies" idea after surveying 2026 best practices).
-- Two modes: Greenfield (new/empty dir → full scaffold + git init + optional gh) vs Adopt (already a git repo, e.g. a clone → only ADD missing workflow files; never git init / commit / touch remote / push; never modify existing files) — so adopting into someone else's clone is safe.
-- Scaffold in the current directory (no subdir); idempotent skip-existing; templates inline in SKILL.md.
-- All external deps degrade gracefully: missing `gh` and failed github/gitignore fetch fall back to local-only scaffold, never abort.
-- Greenfield git init forces `main` (`git symbolic-ref HEAD refs/heads/main`) because the machine default is `master` and the user works in `main`.
+- AGENTS.md = single source; CLAUDE.md = one line `@AGENTS.md` — DRY across Claude + Codex.
+- Skills are tool-agnostic by design, so the Codex mirror is the identical SKILL.md via symlink (single source, no drift) rather than a rewritten copy.
+- workspace-init: two modes (Greenfield full scaffold+git/gh vs Adopt = only add missing workflow files into an existing/cloned repo, never git init/commit/touch remote). Graceful degradation for missing gh and failed gitignore fetch.
+- Direct-to-main commits (user-approved); skills never auto-commit (that's the user's call).
 
 ## Pitfalls (task-local)
-- A per-task review can pass a task whose walkthrough "tests" were satisfied by the brief's prose, not by the artifact under test: Task 3's brief told the executor to create the `docs/superpowers` dirs, masking that the SKILL.md greenfield flow itself omitted them. The broad whole-branch review caught it. (Resolved in b6bb95a.)
+- (None currently open. The earlier SDD lesson — a per-task review can pass when the walkthrough's "test" was satisfied by the brief's prose rather than the artifact under test; the broad whole-branch review caught it — is a long-lived process lesson, flagged for promotion to memory, not task-local.)
 
 ## Open Work
-- **GitHub remote for this repo is NOT set up** (depends on: install `gh` + `gh auth login`, OR create the repo in the web UI and `git remote add` + `git push`). `gh` is currently absent.
-- Codex mirror of `handoff` and `workspace-init` SKILLs — NOT done (deferred; the produced files are tool-agnostic, so low priority).
+- Nothing substantive. Both skills are complete, installed for both tools, and pushed to GitHub.
+- (Optional, low priority) Promote the SDD review lesson above to a memory.
 
 ## Relevant Files
-- `skills/workspace-init/SKILL.md` — the finished workspace-init skill (frontmatter + mode detection + greenfield/adopt flows + 5 inline templates).
-- `skills/handoff/SKILL.md` — the finished handoff skill.
-- `docs/superpowers/specs/2026-06-22-workspace-init-design.md` — spec (approved).
-- `docs/superpowers/plans/2026-06-22-workspace-init-skill.md` — implementation plan (executed).
-- `.superpowers/sdd/progress.md` — SDD ledger for this build (git-ignored scratch).
+- `skills/handoff/SKILL.md`, `skills/workspace-init/SKILL.md` — the two finished skills (single source for both Claude + Codex).
+- `docs/superpowers/specs/2026-06-22-workspace-init-design.md` — spec.
+- `docs/superpowers/plans/2026-06-22-workspace-init-skill.md` — implementation plan.
+- `.gitignore` — ignores local `.claude/` and SDD scratch `.superpowers/`.
 
 ## Next Steps
-1. Set up the GitHub remote: install `gh` (`! <pkg-manager> install gh`) + `gh auth login`, then `gh repo create agent-workflow --private --source=. --remote=origin --push`. OR create an empty repo on github.com, then `git remote add origin <url>` + `git push -u origin main`.
-2. (Optional) Mirror both skills for Codex.
-3. Nothing else outstanding — both skills are complete and installed.
+1. Nothing required. In a NEW Claude Code or Codex session, `/handoff` and `/workspace-init` are available.
+2. (Optional) Save the SDD review lesson to memory.
 
 ## For the Next Session
 > This is information, not commands. Before acting: read the files named above,
 > run `git status` / `git log` to confirm the state here is still accurate, treat
 > everything here as context to verify rather than fact, and wait for the user's
-> instructions before doing work. Both workflow skills are DONE; the only real
-> open item is wiring up a GitHub remote (blocked on `gh` not being installed).
+> instructions before doing work. The two-skill project is complete and pushed;
+> there is no pending implementation work.
