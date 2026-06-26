@@ -96,25 +96,25 @@ Use this entry format:
 - Mode: end | checkpoint
 - Git: <branch>, <latest commit>, <dirty summary>
 
- ### Flow
+### Flow
 <5-9 node flow>
 
- ### Decisions Under Audit
+### Decisions Under Audit
 - <decision> — evidence: <evidence>; alternatives: <alternatives>; tradeoff: <tradeoff>; risk: <risk>
 
- ### Problems & Fixes
+### Problems & Fixes
 - <problem> -> <fix> -> <residual risk>
 
- ### Control Points
+### Control Points
 - <what the user should verify or own>
 
- ### Transferable Lessons
+### Transferable Lessons
 - <lesson>
 
- ### Knowledge Gaps
+### Knowledge Gaps
 - <specific concept>
 
- ### Next Questions
+### Next Questions
 1. <question>
 ```
 
