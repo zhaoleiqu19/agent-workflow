@@ -3,3 +3,6 @@
 
 # Subagent-driven-development scratch (briefs, reports, ledger, diffs)
 .superpowers/
+
+# Local git worktrees
+.worktrees/
