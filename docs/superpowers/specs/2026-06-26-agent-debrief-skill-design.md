@@ -37,7 +37,7 @@ Out(本 skill 不做):
 
 ## 3. 使用模式
 
-`agent-debrief` 是用户主动调用型 skill。建议 frontmatter 使用 `disable-model-invocation: true`,避免模型在每次任务结束时自作主张生成复盘。
+`agent-debrief` 是用户主动调用型 skill。为了同时适配 Codex 和 Claude Code,frontmatter 只使用通用的 `name` 和 `description`;"用户主动调用"约束写入 description 和正文,不依赖 Claude-only 的 `disable-model-invocation` 字段。
 
 支持两种模式:
 
@@ -175,7 +175,7 @@ Out(本 skill 不做):
 - 保存策略:追加,不覆盖。
 - 默认深度:标准版。
 - 审计姿态:强审计。
-- frontmatter:建议 `disable-model-invocation: true`。
+- frontmatter:只使用通用 `name` 和 `description`;用户主动调用约束写入 description/正文。
 
 ## 9. 开放 / 待定
 

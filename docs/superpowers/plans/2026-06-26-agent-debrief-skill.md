@@ -12,9 +12,9 @@
 
 ## File Structure
 
-- Create: `skills/agent-debrief/SKILL.md` — the complete skill: frontmatter, user-invoked behavior, end/checkpoint modes, audit output structure, grounding rules, and optional log append format.
-- No separate template file — the log entry format is embedded inline in `SKILL.md`.
-- No scripts — the workflow is judgment-heavy, and deterministic scripts would not add value in v1.
+- Create: `skills/agent-debrief/SKILL.md` - the complete skill: frontmatter, user-invoked behavior, end/checkpoint modes, audit output structure, grounding rules, and optional log append format.
+- No separate template file - the log entry format is embedded inline in `SKILL.md`.
+- No scripts - the workflow is judgment-heavy, and deterministic scripts would not add value in v1.
 
 ---
 
@@ -26,7 +26,7 @@
 - [ ] **Step 1: Define the structural checks**
 
 The finished file must satisfy all of these:
-- Frontmatter contains `name: agent-debrief`, a `description:`, and `disable-model-invocation: true`.
+- Frontmatter contains only the portable required fields `name: agent-debrief` and `description:`.
 - The description explicitly says to use the skill for agent collaboration debriefs, strong audit, end-of-task debriefs, checkpoint debriefs, and optional `agent-debrief.md` logging.
 - Body defines two modes: `end debrief` and `checkpoint debrief`.
 - Body says default output is in chat and saving is opt-in.
@@ -55,7 +55,6 @@ Write `skills/agent-debrief/SKILL.md` with exactly this content:
 ---
 name: agent-debrief
 description: Create a strong audit debrief after agent-assisted work. Use when the user asks to debrief, review what happened, understand what they learned, reduce out-of-control feelings from Codex/Claude Code/agent collaboration, audit decisions, produce an end-of-task debrief, produce a checkpoint debrief, or optionally append a compressed entry to agent-debrief.md.
-disable-model-invocation: true
 ---
 
 # Agent Debrief
@@ -67,7 +66,7 @@ This skill is not a handoff. `handoff.md` answers "how does the next session con
 ## Modes
 
 - `end debrief` (default): use when a task is done or mostly done. Emphasize final decisions, residual risks, transferable lessons, and what the user should retain.
-- `checkpoint debrief`: use when the user asks for a stage review, "先复盘到这里", "checkpoint", or a mid-task debrief. Emphasize what is confirmed, what is still unstable, and what the user should watch in the next stage.
+- `checkpoint debrief`: use when the user asks for a stage review, "review up to here", "checkpoint", or a mid-task debrief. Emphasize what is confirmed, what is still unstable, and what the user should watch in the next stage.
 
 Default to chat output. Append to `agent-debrief.md` only when the user explicitly asks to save, log, write, append, or persist the debrief.
 
@@ -145,7 +144,7 @@ Write `agent-debrief.md` at the repo root. Append a new entry; never overwrite t
 Use this entry format:
 
 ```markdown
-## <YYYY-MM-DD> — <task title>
+## <YYYY-MM-DD> - <task title>
 
 - Mode: end | checkpoint
 - Git: <branch>, <latest commit>, <dirty summary>
@@ -154,7 +153,7 @@ Use this entry format:
 <5-9 node flow>
 
 ### Decisions Under Audit
-- <decision> — evidence: <evidence>; alternatives: <alternatives>; tradeoff: <tradeoff>; risk: <risk>
+- <decision> - evidence: <evidence>; alternatives: <alternatives>; tradeoff: <tradeoff>; risk: <risk>
 
 ### Problems & Fixes
 - <problem> -> <fix> -> <residual risk>
@@ -191,19 +190,19 @@ Run:
 
 ```bash
 F=skills/agent-debrief/SKILL.md
-echo "=== frontmatter ===" && grep -nE '^(name|description|disable-model-invocation):' "$F"
+echo "=== frontmatter ===" && grep -nE '^(name|description):' "$F" && ! grep -nE '^disable-model-invocation:' "$F"
 echo "=== modes ===" && grep -nE 'end debrief|checkpoint debrief' "$F"
 echo "=== grounding ===" && grep -nE 'git status|git diff|git log --oneline -5|fact|inference' "$F"
-echo "=== output sections ===" && grep -cE '^### (Flow|What Changed|Decisions Under Audit|Problems & Fixes|Control Points|Transferable Lessons|Knowledge Gaps|Next Questions)$' "$F"
+echo "=== output sections ===" && awk '/^## Output Structure$/{in_block=1; next} /^## Saving to agent-debrief.md$/{in_block=0} in_block && /^### (Flow|What Changed|Decisions Under Audit|Problems & Fixes|Control Points|Transferable Lessons|Knowledge Gaps|Next Questions)$/{count++} END{print count+0}' "$F"
 echo "=== audit fields ===" && grep -nE 'Decision:|Evidence:|Alternatives:|Tradeoff:|Risk / Weak Assumption:' "$F"
 echo "=== save discipline ===" && grep -niE 'append|never overwrite|Only save when explicitly requested|Do not `git add`|Do not `git commit`|Do not `git push`|secrets|sensitive' "$F"
 ```
 
 Expected:
-- frontmatter includes `disable-model-invocation: true`
+- frontmatter includes `name` and `description`, and omits platform-specific keys such as `disable-model-invocation`
 - modes show both `end debrief` and `checkpoint debrief`
 - grounding lines show git commands and fact/inference distinction
-- output section count prints `8`
+- output section count prints `8` for the main `Output Structure` block
 - all five audit fields appear
 - save discipline lines include append-only, opt-in save, no git add/commit/push, and secret/sensitive safety
 
@@ -252,7 +251,7 @@ Expected:
 Using `skills/agent-debrief/SKILL.md` as the source of truth, append this entry to `/tmp/agent-debrief-smoke/agent-debrief.md`:
 
 ```markdown
-## 2026-06-26 — README update smoke test
+## 2026-06-26 - README update smoke test
 
 - Mode: checkpoint
 - Git: main, docs: initial readme, dirty README.md
@@ -261,7 +260,7 @@ Using `skills/agent-debrief/SKILL.md` as the source of truth, append this entry 
 Create repo -> Commit README -> Modify README -> Ground in git -> Save debrief entry
 
 ### Decisions Under Audit
-- Use append-only log — evidence: skill save rules require append and never overwrite; alternatives: overwrite a single summary; tradeoff: append keeps history but can grow; risk: file needs periodic pruning if it becomes too long
+- Use append-only log - evidence: skill save rules require append and never overwrite; alternatives: overwrite a single summary; tradeoff: append keeps history but can grow; risk: file needs periodic pruning if it becomes too long
 
 ### Problems & Fixes
 - No functional problem encountered -> wrote a minimal grounded entry -> residual risk is that this smoke test checks structure, not debrief quality
@@ -285,7 +284,7 @@ Run:
 
 ```bash
 cd /tmp/agent-debrief-smoke
-printf '\n## 2026-06-26 — Second entry\n\n- Mode: checkpoint\n- Git: main, docs: initial readme, dirty README.md\n\n### Flow\nFirst entry -> Append second entry\n\n### Decisions Under Audit\n- Keep appending — evidence: existing entry remained in the file; alternatives: overwrite; tradeoff: history preserved; risk: log can grow\n\n### Problems & Fixes\n- No overwrite occurred -> verified with heading count -> no residual risk for append behavior\n\n### Control Points\n- Confirm heading count is 2.\n\n### Transferable Lessons\n- Append-only behavior is easy to verify by counting entry headings.\n\n### Knowledge Gaps\n- Markdown log maintenance conventions.\n\n### Next Questions\n1. When should old entries be summarized?\n' >> agent-debrief.md
+printf '\n## 2026-06-26 - Second entry\n\n- Mode: checkpoint\n- Git: main, docs: initial readme, dirty README.md\n\n### Flow\nFirst entry -> Append second entry\n\n### Decisions Under Audit\n- Keep appending - evidence: existing entry remained in the file; alternatives: overwrite; tradeoff: history preserved; risk: log can grow\n\n### Problems & Fixes\n- No overwrite occurred -> verified with heading count -> no residual risk for append behavior\n\n### Control Points\n- Confirm heading count is 2.\n\n### Transferable Lessons\n- Append-only behavior is easy to verify by counting entry headings.\n\n### Knowledge Gaps\n- Markdown log maintenance conventions.\n\n### Next Questions\n1. When should old entries be summarized?\n' >> agent-debrief.md
 grep -cE '^## 2026-06-26' agent-debrief.md
 ```
 
@@ -330,4 +329,4 @@ Expected: `/tmp/agent-debrief-smoke` no longer exists.
 
 **Placeholder scan:** The `<YYYY-MM-DD>`, `<task title>`, and similar tokens appear only inside the runtime `agent-debrief.md` template embedded in the skill, where placeholders are required. No plan step says TODO/TBD or omits concrete commands. ✓
 
-**Type consistency:** Mode names are consistently `end debrief` and `checkpoint debrief`; output section names match the grep command byte-for-byte; audit fields match the required names exactly. ✓
+**Type consistency:** Mode names are consistently `end debrief` and `checkpoint debrief`; output section names match the block-scoped awk verification byte-for-byte; audit fields match the required names exactly. ✓
