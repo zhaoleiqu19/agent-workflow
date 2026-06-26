@@ -194,7 +194,7 @@ F=skills/agent-debrief/SKILL.md
 echo "=== frontmatter ===" && grep -nE '^(name|description|disable-model-invocation):' "$F"
 echo "=== modes ===" && grep -nE 'end debrief|checkpoint debrief' "$F"
 echo "=== grounding ===" && grep -nE 'git status|git diff|git log --oneline -5|fact|inference' "$F"
-echo "=== output sections ===" && grep -cE '^### (Flow|What Changed|Decisions Under Audit|Problems & Fixes|Control Points|Transferable Lessons|Knowledge Gaps|Next Questions)$' "$F"
+echo "=== output sections ===" && awk '/^## Output Structure$/{in_block=1; next} /^## Saving to agent-debrief.md$/{in_block=0} in_block && /^### (Flow|What Changed|Decisions Under Audit|Problems & Fixes|Control Points|Transferable Lessons|Knowledge Gaps|Next Questions)$/{count++} END{print count+0}' "$F"
 echo "=== audit fields ===" && grep -nE 'Decision:|Evidence:|Alternatives:|Tradeoff:|Risk / Weak Assumption:' "$F"
 echo "=== save discipline ===" && grep -niE 'append|never overwrite|Only save when explicitly requested|Do not `git add`|Do not `git commit`|Do not `git push`|secrets|sensitive' "$F"
 ```
@@ -203,7 +203,7 @@ Expected:
 - frontmatter includes `disable-model-invocation: true`
 - modes show both `end debrief` and `checkpoint debrief`
 - grounding lines show git commands and fact/inference distinction
-- output section count prints `8`
+- output section count prints `8` for the main `Output Structure` block
 - all five audit fields appear
 - save discipline lines include append-only, opt-in save, no git add/commit/push, and secret/sensitive safety
 
@@ -330,4 +330,4 @@ Expected: `/tmp/agent-debrief-smoke` no longer exists.
 
 **Placeholder scan:** The `<YYYY-MM-DD>`, `<task title>`, and similar tokens appear only inside the runtime `agent-debrief.md` template embedded in the skill, where placeholders are required. No plan step says TODO/TBD or omits concrete commands. ✓
 
-**Type consistency:** Mode names are consistently `end debrief` and `checkpoint debrief`; output section names match the grep command byte-for-byte; audit fields match the required names exactly. ✓
+**Type consistency:** Mode names are consistently `end debrief` and `checkpoint debrief`; output section names match the block-scoped awk verification byte-for-byte; audit fields match the required names exactly. ✓
