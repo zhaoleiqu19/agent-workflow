@@ -1,7 +1,6 @@
 ---
 name: agent-debrief
 description: Create a strong audit debrief after agent-assisted work. Use when the user asks to debrief, review what happened, understand what they learned, reduce out-of-control feelings from Codex/Claude Code/agent collaboration, audit decisions, produce an end-of-task debrief, produce a checkpoint debrief, or optionally append a compressed entry to agent-debrief.md.
-disable-model-invocation: true
 ---
 
 # Agent Debrief
@@ -13,7 +12,7 @@ This skill is not a handoff. `handoff.md` answers "how does the next session con
 ## Modes
 
 - `end debrief` (default): use when a task is done or mostly done. Emphasize final decisions, residual risks, transferable lessons, and what the user should retain.
-- `checkpoint debrief`: use when the user asks for a stage review, "先复盘到这里", "checkpoint", or a mid-task debrief. Emphasize what is confirmed, what is still unstable, and what the user should watch in the next stage.
+- `checkpoint debrief`: use when the user asks for a stage review, "review up to here", "checkpoint", or a mid-task debrief. Emphasize what is confirmed, what is still unstable, and what the user should watch in the next stage.
 
 Default to chat output. Append to `agent-debrief.md` only when the user explicitly asks to save, log, write, append, or persist the debrief.
 
@@ -91,7 +90,7 @@ Write `agent-debrief.md` at the repo root. Append a new entry; never overwrite t
 Use this entry format:
 
 ```markdown
-## <YYYY-MM-DD> — <task title>
+## <YYYY-MM-DD> - <task title>
 
 - Mode: end | checkpoint
 - Git: <branch>, <latest commit>, <dirty summary>
@@ -100,7 +99,7 @@ Use this entry format:
 <5-9 node flow>
 
 ### Decisions Under Audit
-- <decision> — evidence: <evidence>; alternatives: <alternatives>; tradeoff: <tradeoff>; risk: <risk>
+- <decision> - evidence: <evidence>; alternatives: <alternatives>; tradeoff: <tradeoff>; risk: <risk>
 
 ### Problems & Fixes
 - <problem> -> <fix> -> <residual risk>
