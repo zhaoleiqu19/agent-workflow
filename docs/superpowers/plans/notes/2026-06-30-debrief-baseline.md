@@ -48,3 +48,61 @@ the mechanism, not just whether labels happened to appear.
 
 #1 and #3 are robustly demonstrated. #2 is structural and must be verified by
 mechanism in GREEN. Proceed with the rewrite.
+
+---
+
+# GREEN — rewritten skill walkthrough (same fixture)
+
+The controller acted as the main agent following the REWRITTEN skill on the
+same fixture `fe92d14`: compiled a Stage 0 neutral decision brief (facts +
+[user-chosen | agent-default] only), then dispatched a FRESH independent
+auditor subagent with git evidence + final artifact + the brief, and
+explicitly NOT the conversation or any reasoning.
+
+## Failure 1 — auditor = auditee — FLIPPED
+
+The audit was produced by a separate subagent with no access to the
+conversation in which the work was decided. It surfaced findings the deciding
+agent would be motivated to omit: that the spec was committed "pending review"
+while implementation commits landed immediately (review window ~ zero), and
+the Chinese-spec / English-SKILL.md fidelity gap. An actor grading itself does
+not volunteer these. Independence is real, not cosmetic.
+
+## Failure 2 — fact/inference — FLIPPED BY MECHANISM
+
+The auditor labeled `(inference)` exactly where it lacked direct evidence for a
+"why" ("may be intentional to keep the design simple (inference)"). Crucially,
+it was never given our actual rationale, so it physically could not state our
+reasoning as fact - it had to cite spec text (evidence) or label inference.
+This is the structural enforcement the baseline run could not exhibit.
+
+## Failure 3 — closed loop — FLIPPED
+
+The auditor produced Transferable Lessons; Stage 3 (main agent) drafts the
+long-lived ones as memory candidates and offers [y/n/edit] before any write.
+Demonstration candidate drafted from the run (NOT written - this was a test,
+not a user-requested debrief):
+
+```markdown
+---
+name: separate-actor-from-auditor
+description: When an actor must evaluate its own output, a separate auditor reduces motivated reasoning
+metadata:
+  type: feedback
+---
+Separating "what happened + who decided" (compiled by the actor) from "was it
+good" (judged by a separate entity given only evidence) structurally cuts
+self-justification. **Why:** the actor cannot launder its rationale into the
+audit if the auditor never receives the rationale. **How to apply:** for any
+self-review, hand the reviewer evidence + a neutral fact list, withhold the
+"why". Links: [[agent-debrief]]
+```
+
+This would be presented for [y/n/edit]; on `y` it is written and MEMORY.md
+updated; on `n` it is dropped. Neither silent-write nor dead-end.
+
+## Conclusion
+
+All three baseline failures flipped. The independent auditor produced sharper,
+less self-serving findings than the baseline self-audit - the intended effect.
+Redesign verified.
