@@ -8,7 +8,7 @@ This repository keeps small, reusable skills that help start projects, preserve 
 
 - `workspace-init` - scaffold a new or adopted project workspace with agent instructions, handoff structure, README, gitignore, and Superpowers docs folders.
 - `handoff` - save or resume volatile cross-session work state in `handoff.md`.
-- `agent-debrief` - audit agent-assisted work after a task or checkpoint so decisions, risks, lessons, and knowledge gaps are explicit.
+- `agent-debrief` - audit agent-assisted work after a task or checkpoint via an independent auditor (a fresh subagent where available, a memory-disabled self-audit otherwise) so decisions, risks, lessons, and knowledge gaps are explicit, then promote long-lived lessons into memory through a draft-confirm-write loop.
 
 ## Layout
 
