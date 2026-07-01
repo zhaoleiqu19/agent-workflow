@@ -58,6 +58,8 @@ Examples:
 "Split into two modules rather than one large file" - [agent-default]
 ```
 
+Derive the brief from the diff, not from memory. Walk each file and hunk the work touched and ask "what judgment produced this shape?" - the choice of library, the file split, the skipped test, the default that could have gone another way. This surfaces agent-default decisions the agent may not think of as decisions. A decision silently dropped from the brief cannot be audited: the independent auditor only sees the brief plus the diff, so an omitted call with no distinct diff signature is invisible to it.
+
 Rules for the brief:
 - Write FACTS and ATTRIBUTION only.
 - Write NO reasoning, justification, or "why" - those belong to the auditor.
@@ -100,7 +102,7 @@ This section defines what the auditor (subagent or degraded self) produces. The 
 
 ### Flow
 
-Write a 5-9 node text flow of the work. Allow and encourage failure branches and rollbacks. Use `->` for progression and `-(fail)->` for a failed attempt that required rerouting.
+Write a 5-9 node text flow for substantial work; fewer nodes is fine for a small task - do not pad. Allow and encourage failure branches and rollbacks. Use `->` for progression and `-(fail)->` for a failed attempt that required rerouting.
 
 Example:
 
@@ -188,19 +190,27 @@ Before promoting any item, apply this test:
 
 ### Memory Candidate Draft Format
 
-Draft each memory candidate as a complete entry with frontmatter, type, and Why/How lines:
+BEFORE drafting any candidate, read one existing memory entry file and the existing `MEMORY.md` index (if any exist in this runtime). Match their on-disk format and location exactly. Fall back to the schema below only when no existing entries are found.
+
+The canonical schema when no existing entries exist:
 
 ```markdown
 ---
-title: <slug-style title>
-date: <YYYY-MM-DD>
-tags: [<relevant-tags>]
-type: lesson | preference | pitfall
+name: <short-kebab-case-slug>
+description: <one-line summary used for recall relevance>
+metadata:
+  type: user | feedback | project | reference
 ---
 
-**Why:** <one sentence on why this matters across sessions and projects>
+<the fact. For feedback/project types, follow with **Why:** and **How to apply:** lines. Link related memories with [[their-name-slug]].>
+```
 
-**How:** <one sentence on what to do or avoid>
+Type values: `user` (user preferences or working style), `feedback` (transferable lesson about how to work - use for most Transferable Lessons), `project` (durable project-specific fact), `reference` (reference material). Do NOT invent other type values.
+
+Each candidate is ONE file (one fact). After writing the entry file, append a one-line pointer to `MEMORY.md` (the index):
+
+```text
+- [Title](file.md) -- short hook
 ```
 
 ### Confirmation Step
@@ -210,14 +220,14 @@ Show ALL drafted memory candidates to the user before writing anything. Ask expl
 ```text
 Memory candidates ready. For each, reply y / n / edit.
 
-1. [<slug-style title>]: <one-line summary>
-2. [<slug-style title>]: <one-line summary>
+1. [<name slug>]: <one-line summary>
+2. [<name slug>]: <one-line summary>
 ...
 ```
 
-Write a memory file and update `MEMORY.md` ONLY after the user confirms with `y` for that entry. If the user replies `n`, discard. If the user replies `edit`, accept their edited version before writing.
+Write the memory entry file AND append the one-line pointer to `MEMORY.md` ONLY after the user confirms with `y` for that entry. If the user replies `n`, the candidate is dropped from memory (but the lesson still appears in the debrief's Transferable Lessons section and in agent-debrief.md if saved). If the user replies `edit`, accept their edited version before writing.
 
-NEVER silently write memory. Draft -> show -> confirm -> write.
+NEVER silently write memory. Draft -> show -> confirm -> write entry file and append to MEMORY.md.
 
 ---
 
